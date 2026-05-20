@@ -1,369 +1,745 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>German Quest - Learn German Gamified</title>
+
   <link rel="stylesheet" href="style.css">
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
 </head>
+
 <body>
+
   <div id="app">
+
     <nav class="navbar">
+
       <div class="nav-brand">
+
         <span class="brand-icon">🇩🇪</span>
+
         <span class="brand-text">German Quest</span>
+
       </div>
+
       <div class="nav-links">
+
         <a href="#" class="nav-link active" data-page="dashboard">Dashboard</a>
+
         <a href="#" class="nav-link" data-page="vocabulary">Vocabulary</a>
+
         <a href="#" class="nav-link" data-page="profile">Profile</a>
+
         <a href="#" class="nav-link" data-page="leaderboard">Leaderboard</a>
+
       </div>
+
       <div class="nav-stats">
+
         <div class="stat-item">
+
           <span class="stat-icon">⚡</span>
+
           <span class="stat-value" id="xp-display">0</span>
+
           <span class="stat-label">XP</span>
+
         </div>
+
         <div class="stat-item">
+
           <span class="stat-icon">🔥</span>
+
           <span class="stat-value" id="streak-display">0</span>
+
           <span class="stat-label">Streak</span>
+
         </div>
+
         <div class="stat-item">
+
           <span class="stat-icon">🪙</span>
+
           <span class="stat-value" id="coins-display">0</span>
+
           <span class="stat-label">Coins</span>
+
         </div>
+
       </div>
+
     </nav>
 
+
+
     <main class="main-content">
+
       <div id="dashboard-page" class="page active">
+
         <div class="dashboard-header">
+
           <h1 class="page-title">Welcome Back, Learner!</h1>
+
           <p class="page-subtitle">Continue your German journey</p>
+
         </div>
+
+
 
         <div class="stats-grid">
+
           <div class="stat-card glass-card">
+
             <div class="stat-card-icon">📚</div>
+
             <div class="stat-card-content">
+
               <h3>Total Words</h3>
+
               <p class="stat-number" id="total-words">0</p>
+
             </div>
+
           </div>
+
           <div class="stat-card glass-card">
+
             <div class="stat-card-icon">🎯</div>
+
             <div class="stat-card-content">
+
               <h3>Accuracy</h3>
+
               <p class="stat-number" id="accuracy">0%</p>
+
             </div>
+
           </div>
+
           <div class="stat-card glass-card">
+
             <div class="stat-card-icon">⭐</div>
+
             <div class="stat-card-content">
+
               <h3>Level</h3>
+
               <p class="stat-number" id="level">1</p>
+
             </div>
+
           </div>
+
           <div class="stat-card glass-card">
+
             <div class="stat-card-icon">🏆</div>
+
             <div class="stat-card-content">
+
               <h3>Rank</h3>
+
               <p class="stat-number">#--</p>
+
             </div>
+
           </div>
+
         </div>
+
+
 
         <div class="game-modes">
+
           <h2 class="section-title">Game Modes</h2>
+
           <div class="modes-grid">
+
             <div class="mode-card glass-card" onclick="navigateTo('quiz')">
+
               <div class="mode-icon">❓</div>
+
               <h3>Multiple Choice Quiz</h3>
+
               <p>Test your knowledge with quick quizzes</p>
+
               <div class="mode-badge">+10 XP</div>
+
             </div>
+
             <div class="mode-card glass-card" onclick="navigateTo('flashcards')">
+
               <div class="mode-icon">🔄</div>
+
               <h3>Flashcards</h3>
+
               <p>Learn with interactive flashcards</p>
+
               <div class="mode-badge">+5 XP</div>
+
             </div>
+
             <div class="mode-card glass-card" onclick="navigateTo('typing')">
+
               <div class="mode-icon">⌨️</div>
+
               <h3>Typing Challenge</h3>
+
               <p>Type the correct German translation</p>
+
               <div class="mode-badge">+15 XP</div>
+
             </div>
+
             <div class="mode-card glass-card" onclick="navigateTo('memory')">
+
               <div class="mode-icon">🧠</div>
+
               <h3>Memory Match</h3>
+
               <p>Match German words with English</p>
+
               <div class="mode-badge">+20 XP</div>
+
             </div>
+
           </div>
+
         </div>
+
+
 
         <div class="recent-activity">
+
           <h2 class="section-title">Recent Activity</h2>
+
           <div class="activity-list" id="activity-list">
+
             <div class="activity-item glass-card">
+
               <div class="activity-icon">🎉</div>
+
               <div class="activity-content">
+
                 <p>Welcome to German Quest!</p>
+
                 <span class="activity-time">Just now</span>
+
               </div>
+
             </div>
+
           </div>
+
         </div>
+
       </div>
+
+
 
       <div id="vocabulary-page" class="page">
+
         <div class="page-header">
+
           <h1 class="page-title">Vocabulary Manager</h1>
+
           <button class="btn-primary" onclick="showAddWordModal()">+ Add Word</button>
+
         </div>
+
+
 
         <div class="vocabulary-controls">
+
           <input type="text" id="search-vocab" class="search-input" placeholder="Search vocabulary...">
+
           <select id="category-filter" class="filter-select">
+
             <option value="all">All Categories</option>
+
             <option value="General">General</option>
+
             <option value="Food">Food</option>
+
             <option value="Travel">Travel</option>
+
             <option value="Business">Business</option>
+
             <option value="Family">Family</option>
+
           </select>
+
           <select id="difficulty-filter" class="filter-select">
+
             <option value="all">All Difficulties</option>
+
             <option value="Easy">Easy</option>
+
             <option value="Medium">Medium</option>
+
             <option value="Hard">Hard</option>
+
           </select>
+
         </div>
+
+
 
         <div class="vocabulary-grid" id="vocabulary-grid">
+
         </div>
+
       </div>
+
+
 
       <div id="flashcards-page" class="page">
+
         <div class="page-header">
+
           <h1 class="page-title">Flashcards</h1>
+
           <div class="flashcard-stats">
+
             <span id="flashcard-progress">0 / 0</span>
+
           </div>
+
         </div>
+
+
 
         <div class="flashcard-container">
+
           <div class="flashcard glass-card" id="flashcard">
+
             <div class="flashcard-inner">
+
               <div class="flashcard-front">
+
                 <div class="flashcard-word" id="flashcard-german">-</div>
+
                 <div class="flashcard-article" id="flashcard-article">-</div>
+
                 <button class="btn-secondary" onclick="flipCard()">Show Answer</button>
+
               </div>
+
               <div class="flashcard-back">
+
                 <div class="flashcard-translation" id="flashcard-english">-</div>
+
                 <div class="flashcard-category" id="flashcard-category">-</div>
+
                 <div class="flashcard-actions">
+
                   <button class="btn-danger" onclick="markCard('hard')">Hard</button>
+
                   <button class="btn-warning" onclick="markCard('medium')">Medium</button>
+
                   <button class="btn-success" onclick="markCard('easy')">Easy</button>
+
                 </div>
+
               </div>
+
             </div>
+
           </div>
+
         </div>
+
+
 
         <div class="flashcard-controls">
+
           <button class="btn-secondary" onclick="previousCard()">← Previous</button>
+
           <button class="btn-primary" onclick="shuffleCards()">Shuffle</button>
+
           <button class="btn-secondary" onclick="nextCard()">Next →</button>
+
         </div>
+
       </div>
+
+
 
       <div id="quiz-page" class="page">
+
         <div class="page-header">
+
           <h1 class="page-title">Quiz Mode</h1>
+
           <div class="quiz-stats">
+
             <span id="quiz-score">Score: 0</span>
+
             <span id="quiz-progress">Question 1/10</span>
+
           </div>
+
         </div>
+
+
 
         <div class="quiz-container glass-card" id="quiz-container">
+
           <div class="quiz-question">
+
             <h2 id="quiz-word">Loading...</h2>
+
             <p id="quiz-instruction">Select the correct English translation</p>
+
           </div>
+
           <div class="quiz-options" id="quiz-options">
+
           </div>
+
         </div>
+
+
 
         <div class="quiz-feedback" id="quiz-feedback"></div>
+
       </div>
+
+
 
       <div id="typing-page" class="page">
+
         <div class="page-header">
+
           <h1 class="page-title">Typing Challenge</h1>
+
           <div class="typing-stats">
+
             <span id="typing-score">Score: 0</span>
+
             <span id="typing-progress">Word 1/10</span>
+
             <span id="typing-timer">Time: 0s</span>
+
           </div>
+
         </div>
+
+
 
         <div class="typing-container glass-card">
+
           <div class="typing-word-display">
+
             <h2 id="typing-english-word">Loading...</h2>
-            <p>Type the German translation:</p>
+
+            <p id="typing-instruction">Type the German translation:</p>
+
           </div>
+
           <input type="text" id="typing-input" class="typing-input" placeholder="Type German word here..." autocomplete="off">
-          <button class="btn-primary" onclick="checkTypingAnswer()">Submit</button>
+
+          <button class="btn-primary" id="typing-submit-btn" onclick="checkTypingAnswer()">Submit</button>
+
           <div class="typing-feedback" id="typing-feedback"></div>
+
         </div>
+
       </div>
+
+
 
       <div id="memory-page" class="page">
+
         <div class="page-header">
+
           <h1 class="page-title">Memory Match</h1>
+
           <div class="memory-stats">
+
             <span id="memory-moves">Moves: 0</span>
+
             <span id="memory-matches">Matches: 0/8</span>
+
           </div>
+
         </div>
+
+
 
         <div class="memory-grid" id="memory-grid">
+
         </div>
+
+        <div class="memory-complete" id="memory-complete" style="display: none; text-align: center; margin-top: 2rem;">
+
+          <button class="btn-primary" onclick="initMemory()">Try Again</button>
+
+        </div>
+
       </div>
+
+
 
       <div id="profile-page" class="page">
+
         <div class="page-header">
+
           <h1 class="page-title">Profile</h1>
+
         </div>
+
+
 
         <div class="profile-header glass-card">
+
           <div class="profile-avatar">👤</div>
+
           <div class="profile-info">
+
             <h2>German Learner</h2>
+
             <p>Level <span id="profile-level">1</span></p>
+
           </div>
+
         </div>
+
+
 
         <div class="profile-stats">
+
           <div class="profile-stat glass-card">
+
             <h3>Total XP</h3>
+
             <p class="stat-number" id="profile-xp">0</p>
+
           </div>
+
           <div class="profile-stat glass-card">
+
             <h3>Words Learned</h3>
+
             <p class="stat-number" id="profile-words">0</p>
+
           </div>
+
           <div class="profile-stat glass-card">
+
             <h3>Quizzes Completed</h3>
+
             <p class="stat-number" id="profile-quizzes">0</p>
+
           </div>
+
           <div class="profile-stat glass-card">
+
             <h3>Best Streak</h3>
+
             <p class="stat-number" id="profile-streak">0</p>
+
           </div>
+
         </div>
+
+
 
         <div class="achievements-section">
+
           <h2 class="section-title">Achievements</h2>
+
           <div class="achievements-grid" id="achievements-grid">
+
             <div class="achievement-card glass-card locked">
+
               <div class="achievement-icon">🎯</div>
+
               <h3>First Steps</h3>
+
               <p>Complete your first quiz</p>
+
             </div>
+
             <div class="achievement-card glass-card locked">
+
               <div class="achievement-icon">🔥</div>
+
               <h3>On Fire</h3>
+
               <p>Reach a 7-day streak</p>
+
             </div>
+
             <div class="achievement-card glass-card locked">
+
               <div class="achievement-icon">📚</div>
+
               <h3>Word Collector</h3>
+
               <p>Learn 100 words</p>
+
             </div>
+
             <div class="achievement-card glass-card locked">
+
               <div class="achievement-icon">⭐</div>
+
               <h3>Perfect Score</h3>
+
               <p>Get 100% on a quiz</p>
+
             </div>
+
           </div>
+
         </div>
+
       </div>
+
+
 
       <div id="leaderboard-page" class="page">
+
         <div class="page-header">
+
           <h1 class="page-title">Leaderboard</h1>
+
         </div>
+
+
 
         <div class="leaderboard-container glass-card">
+
           <div class="leaderboard-tabs">
+
             <button class="tab-btn active" data-tab="weekly">Weekly</button>
+
             <button class="tab-btn" data-tab="monthly">Monthly</button>
+
             <button class="tab-btn" data-tab="all-time">All Time</button>
+
           </div>
+
+
 
           <div class="leaderboard-list" id="leaderboard-list">
+
             <div class="leaderboard-item">
+
               <span class="rank">1</span>
+
               <span class="player">Player 1</span>
+
               <span class="score">10,000 XP</span>
+
             </div>
+
             <div class="leaderboard-item">
+
               <span class="rank">2</span>
+
               <span class="player">Player 2</span>
+
               <span class="score">8,500 XP</span>
+
             </div>
+
             <div class="leaderboard-item">
+
               <span class="rank">3</span>
+
               <span class="player">Player 3</span>
+
               <span class="score">7,200 XP</span>
+
             </div>
+
           </div>
+
         </div>
+
       </div>
+
     </main>
+
   </div>
+
+
 
   <div id="add-word-modal" class="modal">
+
     <div class="modal-content glass-card">
+
       <div class="modal-header">
+
         <h2>Add New Word</h2>
+
         <button class="modal-close" onclick="closeModal('add-word-modal')">&times;</button>
+
       </div>
+
       <form id="add-word-form" onsubmit="addWord(event)">
+
         <input type="text" id="new-german" placeholder="German Word" required>
+
         <input type="text" id="new-english" placeholder="English Translation" required>
+
         <select id="new-article">
+
+          <option value="">None</option>
+
           <option value="der">der (masculine)</option>
+
           <option value="die">die (feminine)</option>
+
           <option value="das">das (neuter)</option>
+
         </select>
+
         <select id="new-category">
+
           <option value="General">General</option>
+
           <option value="Food">Food</option>
+
           <option value="Travel">Travel</option>
+
           <option value="Business">Business</option>
+
           <option value="Family">Family</option>
+
         </select>
+
         <select id="new-difficulty">
+
           <option value="Easy">Easy</option>
+
           <option value="Medium">Medium</option>
+
           <option value="Hard">Hard</option>
+
         </select>
+
         <button type="submit" class="btn-primary">Add Word</button>
+
       </form>
+
     </div>
+
   </div>
 
+
+
   <script src="script.js"></script>
+
 </body>
+
 </html>
