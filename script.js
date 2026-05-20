@@ -225,7 +225,9 @@ function getSampleVocabulary() {
     { id: 7, german: 'Brot', english: 'Bread', article: 'das', category: 'Food', difficulty: 'Easy', learned: 'No' },
     { id: 8, german: 'Freund', english: 'Friend', article: 'der', category: 'Family', difficulty: 'Medium', learned: 'No' },
     { id: 9, german: 'Schule', english: 'School', article: 'die', category: 'General', difficulty: 'Easy', learned: 'No' },
-    { id: 10, german: 'Arbeit', english: 'Work', article: 'die', category: 'Business', difficulty: 'Medium', learned: 'No' }
+    { id: 10, german: 'Arbeit', english: 'Work', article: 'die', category: 'Business', difficulty: 'Medium', learned: 'No' },
+    { id: 11, german: 'von', english: 'from', article: '', category: 'General', difficulty: 'Easy', learned: 'No' },
+    { id: 12, german: 'mit', english: 'with', article: '', category: 'General', difficulty: 'Easy', learned: 'No' }
   ];
 }
 
@@ -249,7 +251,7 @@ function renderVocabulary() {
       <div class="vocab-card-header">
         <div>
           <div class="vocab-german">${word.german}</div>
-          <div class="vocab-article">${word.article}</div>
+          ${word.article ? `<div class="vocab-article">${word.article}</div>` : ''}
         </div>
         <button class="btn-secondary" onclick="toggleFavorite(${word.id})">⭐</button>
       </div>
@@ -328,6 +330,7 @@ function toggleFavorite(id) {
 // Flashcards
 function initFlashcards() {
   state.flashcardIndex = 0;
+  document.getElementById('flashcard-try-again').style.display = 'none';
   updateFlashcard();
 }
 
@@ -335,11 +338,19 @@ function updateFlashcard() {
   const word = state.vocabulary[state.flashcardIndex];
   if (word) {
     document.getElementById('flashcard-german').textContent = word.german;
-    document.getElementById('flashcard-article').textContent = word.article;
+    document.getElementById('flashcard-article').textContent = word.article || '';
     document.getElementById('flashcard-english').textContent = word.english;
     document.getElementById('flashcard-category').textContent = word.category;
     document.getElementById('flashcard-progress').textContent = 
       `${state.flashcardIndex + 1} / ${state.vocabulary.length}`;
+    
+    // Show try again button at last card
+    const tryAgainBtn = document.getElementById('flashcard-try-again');
+    if (state.flashcardIndex === state.vocabulary.length - 1) {
+      tryAgainBtn.style.display = 'inline-block';
+    } else {
+      tryAgainBtn.style.display = 'none';
+    }
     
     // Reset flip
     document.getElementById('flashcard').classList.remove('flipped');
@@ -368,6 +379,7 @@ function previousCard() {
 function shuffleCards() {
   state.vocabulary = state.vocabulary.sort(() => Math.random() - 0.5);
   state.flashcardIndex = 0;
+  document.getElementById('flashcard-try-again').style.display = 'none';
   updateFlashcard();
   showNotification('Cards shuffled!');
 }
@@ -413,7 +425,7 @@ function loadQuizQuestion() {
   }
   
   const question = state.quizQuestions[state.quizQuestionIndex];
-  document.getElementById('quiz-word').textContent = `${question.word.article} ${question.word.german}`;
+  document.getElementById('quiz-word').textContent = question.word.article ? `${question.word.article} ${question.word.german}` : question.word.german;
   document.getElementById('quiz-progress').textContent = 
     `Question ${state.quizQuestionIndex + 1}/${state.quizQuestions.length}`;
   document.getElementById('quiz-score').textContent = `Score: ${state.quizScore}`;
@@ -654,6 +666,16 @@ let typingState = {
 };
 
 function initTyping() {
+  // Remove try again button if exists
+  const existingBtn = document.getElementById('typing-try-again');
+  if (existingBtn) {
+    existingBtn.remove();
+  }
+  
+  // Show input and submit button
+  document.getElementById('typing-input').style.display = 'block';
+  document.getElementById('typing-submit-btn').style.display = 'block';
+  
   typingState = {
     words: [...state.vocabulary].sort(() => Math.random() - 0.5).slice(0, 10),
     currentIndex: 0,
@@ -728,9 +750,26 @@ function startTypingTimer() {
 
 function endTyping() {
   clearInterval(typingState.timerInterval);
-  document.getElementById('typing-english-word').textContent = 'Challenge Complete!';
-  document.getElementById('typing-feedback').textContent = `Final Score: ${typingState.score} XP in ${typingState.timer}s`;
+  document.getElementById('typing-english-word').textContent = 'Typing Challenge Completed!';
+  document.getElementById('typing-instruction').textContent = `Final Score: ${typingState.score} XP`;
+  document.getElementById('typing-feedback').textContent = '';
   document.getElementById('typing-input').disabled = true;
+  document.getElementById('typing-input').style.display = 'none';
+  document.getElementById('typing-submit-btn').style.display = 'none';
+  
+  // Add try again button
+  const container = document.querySelector('.typing-container');
+  const existingBtn = document.getElementById('typing-try-again');
+  if (!existingBtn) {
+    const tryAgainBtn = document.createElement('button');
+    tryAgainBtn.id = 'typing-try-again';
+    tryAgainBtn.className = 'btn-primary';
+    tryAgainBtn.textContent = 'Try Again';
+    tryAgainBtn.onclick = initTyping;
+    tryAgainBtn.style.marginTop = '1rem';
+    container.appendChild(tryAgainBtn);
+  }
+  
   state.userStats.quizzesCompleted++;
   saveToStorage();
   updateStats();
@@ -750,6 +789,9 @@ function initMemory() {
     document.getElementById('memory-grid').innerHTML = '<p>Need at least 8 words to play Memory Match!</p>';
     return;
   }
+  
+  // Hide try again button
+  document.getElementById('memory-complete').style.display = 'none';
   
   const selectedWords = [...state.vocabulary].sort(() => Math.random() - 0.5).slice(0, 8);
   const cardPairs = [];
@@ -835,90 +877,93 @@ function updateMemoryStats() {
 }
 
 function endMemory() {
-addXP(20);
-state.userStats.quizzesCompleted++;
-saveToStorage();
-updateStats();
-showNotification(`Memory Match Complete! ${memoryState.moves} moves - +20 XP`);
-playSound('complete');
+  addXP(20);
+  state.userStats.quizzesCompleted++;
+  saveToStorage();
+  updateStats();
+  showNotification(`Memory Match Complete! ${memoryState.moves} moves - +20 XP`);
+  playSound('complete');
+  
+  // Show try again button
+  document.getElementById('memory-complete').style.display = 'block';
 }
 
 // Sound Effects using Web Audio API
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 function playSound(type) {
-try {
-const oscillator = audioContext.createOscillator();
-const gainNode = audioContext.createGain();
-  
-oscillator.connect(gainNode);
-gainNode.connect(audioContext.destination);
-  
-switch(type) {
-case 'correct':
-oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
-oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
-oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
-gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-oscillator.start(audioContext.currentTime);
-oscillator.stop(audioContext.currentTime + 0.3);
-break;
-case 'wrong':
-oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-oscillator.frequency.setValueAtTime(150, audioContext.currentTime + 0.1);
-gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-oscillator.start(audioContext.currentTime);
-oscillator.stop(audioContext.currentTime + 0.2);
-break;
-case 'levelup':
-oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
-oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
-oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
-oscillator.frequency.setValueAtTime(1046.50, audioContext.currentTime + 0.3);
-gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-oscillator.start(audioContext.currentTime);
-oscillator.stop(audioContext.currentTime + 0.5);
-break;
-case 'flip':
-oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-oscillator.start(audioContext.currentTime);
-oscillator.stop(audioContext.currentTime + 0.1);
-break;
-case 'match':
-oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.1);
-gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-oscillator.start(audioContext.currentTime);
-oscillator.stop(audioContext.currentTime + 0.2);
-break;
-case 'complete':
-oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
-oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.15);
-oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.3);
-oscillator.frequency.setValueAtTime(1046.50, audioContext.currentTime + 0.45);
-oscillator.frequency.setValueAtTime(1318.51, audioContext.currentTime + 0.6);
-gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
-oscillator.start(audioContext.currentTime);
-oscillator.stop(audioContext.currentTime + 0.8);
-break;
-case 'click':
-oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
-oscillator.start(audioContext.currentTime);
-oscillator.stop(audioContext.currentTime + 0.05);
-break;
-}
-} catch (error) {
-console.log('Audio not supported or blocked');
-}
+  try {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    switch(type) {
+      case 'correct':
+        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+        oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+        break;
+      case 'wrong':
+        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(150, audioContext.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.2);
+        break;
+      case 'levelup':
+        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+        oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
+        oscillator.frequency.setValueAtTime(1046.50, audioContext.currentTime + 0.3);
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+        break;
+      case 'flip':
+        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.1);
+        break;
+      case 'match':
+        oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.2);
+        break;
+      case 'complete':
+        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.15);
+        oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.3);
+        oscillator.frequency.setValueAtTime(1046.50, audioContext.currentTime + 0.45);
+        oscillator.frequency.setValueAtTime(1318.51, audioContext.currentTime + 0.6);
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.8);
+        break;
+      case 'click':
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.05);
+        break;
+    }
+  } catch (error) {
+    console.log('Audio not supported or blocked');
+  }
 }
 
 // Enhanced animations
